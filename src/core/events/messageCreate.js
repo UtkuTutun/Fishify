@@ -70,6 +70,16 @@ module.exports = {
     const command = client.commands.get(commandName);
     if (!command) return;
     try {
+      // Komut logla
+      const { logCommand } = require('../status/commandLogger');
+      logCommand({
+        client,
+        user: message.author,
+        command: commandName,
+        args,
+        guild: message.guild,
+        channel: message.channel
+      });
       await command.execute(message, args, client);
     } catch (error) {
       const logger = require('../utils/logger');

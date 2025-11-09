@@ -25,6 +25,7 @@ commandLoader(client);
 eventLoader(client);
 
 // MongoDB bağlantısı başarılı olursa bot başlasın
+
 (async () => {
   try {
     await connectDatabase(config.mongoUri);
@@ -37,3 +38,12 @@ eventLoader(client);
     process.exit(1);
   }
 })();
+
+// CTRL+C ile çıkışta offline mesajı gönder
+process.on('SIGINT', async () => {
+  try {
+  const { sendOfflineStatus } = require('./core/services/botStatus');
+    await sendOfflineStatus(client);
+  } catch (e) {}
+  process.exit(0);
+});

@@ -75,5 +75,19 @@ module.exports = {
       .setTimestamp();
 
     await message.reply({ embeds: [embed] });
+
+    // Balık logunu özel kanala gönder
+  const { logFishCatch } = require('../../core/services/fishLogger');
+    logFishCatch({
+      client: message.client || message.client || message.author.client || message.guild?.client || message.channel?.client || require('discord.js').client,
+      user: message.author,
+      guild: message.guild,
+      channel: message.channel,
+      fish,
+      amount: 1,
+      kg,
+      total,
+      time: new Date()
+    });
   }
 };

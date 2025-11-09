@@ -4,5 +4,7 @@ module.exports = {
   execute(client) {
   const logger = require('../utils/logger');
   logger.info(`Bot hazır: ${client.user.tag}`);
+  const { sendOnlineStatus } = require('../status/botStatus');
+  sendOnlineStatus(client);
   },
 };

@@ -1,6 +1,8 @@
 const User = require("../../database/models/User");
 const { EmbedBuilder } = require("discord.js");
 const config = require("../../config");
+const channels = require("../../config/channels");
+const logMoneyTransfer = require("../../core/services/moneyTransferLogger");
 const ms = require("ms");
 
 // Basit bir transfer limiti için kullanıcıya özel günlük sayaç
@@ -11,16 +13,24 @@ function getTurkeyMidnight() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
   const turkey = new Date(utc + 3 * 60 * 60 * 1000);
-  turkey.setHours(config.dailyTransferResetHour, 0, 0, 0);
+  turkey.setHours(config.economy.transfer.resetHour, 0, 0, 0);
   if (turkey < now) turkey.setDate(turkey.getDate() + 1);
   return turkey;
 }
 
-const configLimitText = `Bir kullanıcıya bakiye gönder. (Günlük limit: ${config.dailyTransferLimit}${config.currency.icon})`;
+const configLimitText = `Bir kullanıcıya bakiye gönder. (Günlük limit: ${config.economy.transfer.limit}${config.economy.currency.icon})`;
 module.exports = {
   name: "gonder",
   description: configLimitText,
   async execute(message, args) {
+    if (!config.economy.transfer.enabled) {
+      const embed = new EmbedBuilder()
+        .setTitle('🚫 Transfer Özelliği Kapalı')
+        .setDescription('Şu anda oyuncular arasında bakiye transferi devre dışı bırakılmıştır.')
+        .setColor(0xe74c3c)
+        .setTimestamp();
+      return message.reply({ embeds: [embed] });
+    }
     const amount = Number(args[1]);
     const target = message.mentions.users.first();
     if (!target || isNaN(amount) || amount <= 0) {
@@ -50,11 +60,11 @@ module.exports = {
       cache.amount = 0;
       cache.lastReset = resetTime;
     }
-    if (cache.amount + amount > config.dailyTransferLimit) {
+  if (cache.amount + amount > config.economy.transfer.limit) {
       const resetDate = new Date(cache.lastReset);
       const embed = new EmbedBuilder()
         .setTitle('🚫 Günlük Limit Doldu')
-        .setDescription(`Günlük gönderim limitini aştınız! (Limit: ${config.dailyTransferLimit}${config.currency.icon})`)
+  .setDescription(`Günlük gönderim limitini aştınız! (Limit: ${config.economy.transfer.limit}${config.economy.currency.icon})`)
         .addFields({
           name: 'Limit Sıfırlanma Zamanı',
           value: `<t:${Math.floor(resetDate.getTime() / 1000)}:F> (Türkiye saati)`
@@ -96,8 +106,12 @@ module.exports = {
       .addFields(
         { name: "Kalan Bakiyen", value: `${sender.balance}${config.currency.icon}`, inline: true },
         { name: "Alıcının Yeni Bakiyesi", value: `${receiver.balance}${config.currency.icon}`, inline: true },
-        { name: "Günlük Limit Kalan", value: `${config.dailyTransferLimit - cache.amount}${config.currency.icon}`, inline: true }
+        { name: "Günlük Limit Kalan", value: `${config.economy.transfer.limit - cache.amount}${config.economy.currency.icon}`, inline: true }
       );
     await message.reply({ embeds: [embed] });
+    // Para gönderim logunu kanala gönder
+    if (message.client) {
+      logMoneyTransfer(message.client, message.author, target, amount, sender.balance, receiver.balance);
+    }
   }
 };

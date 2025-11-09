@@ -1,7 +1,14 @@
 const config = require("../../config");
 
+
 function formatPrice(amount) {
-  return `${amount.toFixed(2)} ${config.currency.icon}`;
+  let icon = '₺';
+  if (config.economy && config.economy.currency && config.economy.currency.icon) {
+    icon = config.economy.currency.icon;
+  } else if (config.currency && config.currency.icon) {
+    icon = config.currency.icon;
+  }
+  return `${amount.toFixed(2)} ${icon}`;
 }
 
 module.exports = formatPrice;
