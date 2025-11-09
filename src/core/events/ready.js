@@ -1,10 +1,18 @@
+const logger = require('../utils/logger');
+const { sendOnlineStatus } = require('../services/botStatus');
+const disconnectEvent = require('./disconnect');
+
+const resetOfflineNotification =
+  typeof disconnectEvent.resetOfflineNotification === 'function'
+    ? disconnectEvent.resetOfflineNotification
+    : () => {};
+
 module.exports = {
-  name: 'clientReady',
+  name: 'ready',
   once: true,
   execute(client) {
-  const logger = require('../utils/logger');
-  logger.info(`Bot hazır: ${client.user.tag}`);
-  const { sendOnlineStatus } = require('../status/botStatus');
-  sendOnlineStatus(client);
-  },
+    logger.info(`Bot hazır: ${client.user.tag}`);
+    resetOfflineNotification();
+    sendOnlineStatus(client);
+  }
 };

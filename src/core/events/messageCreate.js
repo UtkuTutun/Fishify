@@ -1,78 +1,85 @@
+const { EmbedBuilder } = require('discord.js');
 
-const { prefix: defaultPrefix } = require('../../config');
-const Guild = require('../../database/models/Guild');
+const config = require('../../config');
+const { logCommand } = require('../services/commandLogger');
+const logger = require('../utils/logger');
+const guildConfigService = require('../services/guildConfigService');
+
+const ALWAYS_ALLOWED = new Set(config.alwaysAllowedCommands.map((cmd) => cmd.toLowerCase()));
+
+function buildNoChannelEmbed(prefix) {
+  return new EmbedBuilder()
+    .setTitle('Komut Kullanılabilen Kanallar')
+    .setDescription(
+      'Hiçbir kanal ekli değil. Lütfen bir kanal ekleyin!\n\n' +
+      `**Kanal eklemek için:** \`${prefix}kanalekle #kanal\`\n` +
+      '**Kimler ekleyebilir:** Sunucu yöneticileri'
+    )
+    .setColor(0x3498db)
+    .setFooter({ text: 'Komut Kullanılabilen Kanallar' });
+}
+
+function buildChannelListEmbed(message, allowedChannels) {
+  const channelMentions = allowedChannels
+    .map((id) => {
+      const channel = message.guild.channels.cache.get(id);
+      return channel ? `<#${id}>` : null;
+    })
+    .filter(Boolean)
+    .join('\n') || 'Hiçbir kanal bulunamadı.';
+
+  return new EmbedBuilder()
+    .setTitle('Komut Kullanılabilen Kanallar')
+    .setDescription(channelMentions)
+    .setColor(0x3498db);
+}
 
 module.exports = {
   name: 'messageCreate',
   async execute(message, client) {
-    if (message.author.bot || !message.guild) return;
-    // Get prefix and allowed channels from DB or use default
-    let guildPrefix = defaultPrefix;
-    let allowedChannels = [];
-    try {
-      const guildData = await Guild.findOne({ guildId: message.guild.id });
-      if (guildData) {
-        if (guildData.prefix) guildPrefix = guildData.prefix;
-        if (Array.isArray(guildData.allowedChannels)) allowedChannels = guildData.allowedChannels;
-      }
-    } catch (e) {
-      // DB error, fallback to defaultPrefix
+    if (message.author.bot || !message.guild) {
+      return;
     }
-    if (!message.content.startsWith(guildPrefix)) return;
-    // Komut adını ve argümanları bir kez tanımla
-    const args = message.content.slice(guildPrefix.length).trim().split(/ +/);
+
+    const { prefix, allowedChannels } = await guildConfigService.getGuildSettings(message.guild.id);
+
+    if (!message.content.startsWith(prefix)) {
+      return;
+    }
+
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift()?.toLowerCase();
-    const { alwaysAllowedCommands } = require('../../config');
-    // Eğer sunucuda hiç kanal ekli değilse, sadece alwaysAllowedCommands komutlarına izin ver
-    if (
-      allowedChannels.length === 0 &&
-      !alwaysAllowedCommands.includes(commandName)
-    ) {
-      const { EmbedBuilder } = require('discord.js');
-      const embed = new EmbedBuilder()
-        .setTitle('Komut Kullanılabilen Kanallar')
-        .setDescription('Hiçbir kanal ekli değil. Lütfen bir kanal ekleyin!')
-        .setColor(0x3498db);
-      embed.setDescription(
-        'Hiçbir kanal ekli değil. Lütfen bir kanal ekleyin!\n\n' +
-        '**Kanal eklemek için:** `!kanalekle #kanal`\n' +
-        '**Kimler ekleyebilir:** Sunucu yöneticileri'
-      );
-      embed.setFooter({ text: 'Komut Kullanılabilen Kanallar' });
-      return message.reply({
-        embeds: [embed]
-      });
+
+    if (!commandName) {
+      return;
     }
-    // Eğer komut alwaysAllowedCommands içinde değilse ve bu kanal izinli kanallar arasında yoksa, izin verme
+
+    if (allowedChannels.length === 0 && !ALWAYS_ALLOWED.has(commandName)) {
+      const embed = buildNoChannelEmbed(prefix);
+      await message.reply({ embeds: [embed] });
+      return;
+    }
+
     if (
       allowedChannels.length > 0 &&
       !allowedChannels.includes(String(message.channel.id)) &&
-      !alwaysAllowedCommands.includes(commandName)
+      !ALWAYS_ALLOWED.has(commandName)
     ) {
-      const { EmbedBuilder } = require('discord.js');
-      let channelMentions = allowedChannels
-        .map(id => {
-          const ch = message.guild.channels.cache.get(id);
-          return ch ? `<#${id}>` : null;
-        })
-        .filter(Boolean)
-        .join('\n');
-      if (!channelMentions) channelMentions = 'Hiçbir kanal bulunamadı.';
-      const embed = new EmbedBuilder()
-        .setTitle('Komut Kullanılabilen Kanallar')
-        .setDescription(channelMentions)
-        .setColor(0x3498db);
-      return message.reply({
+      const embed = buildChannelListEmbed(message, allowedChannels);
+      await message.reply({
         content: 'Bu kanalda komut kullanılamaz. Sadece aşağıdaki kanallarda komut kullanabilirsin:',
         embeds: [embed]
       });
+      return;
     }
+
     const command = client.commands.get(commandName);
-    if (!command) return;
+    if (!command) {
+      return;
+    }
+
     try {
-      // Komut logla
-      const { logCommand } = require('../status/commandLogger');
-      logCommand({
+      await logCommand({
         client,
         user: message.author,
         command: commandName,
@@ -80,11 +87,11 @@ module.exports = {
         guild: message.guild,
         channel: message.channel
       });
+
       await command.execute(message, args, client);
     } catch (error) {
-      const logger = require('../utils/logger');
       await logger.error(error);
-      message.reply('Bir hata oluştu!');
+      await message.reply('Bir hata oluştu!');
     }
-  },
+  }
 };

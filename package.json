@@ -1,18 +1,23 @@
 {
   "name": "fishify",
   "version": "1.0.0",
-  "main": "src/bot.js",
+  "private": true,
   "type": "commonjs",
+  "main": "src/bot.js",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "start": "node src/bot.js"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   },
   "dependencies": {
-    "chalk": "^5.6.2",
-    "discord.js": "latest",
-    "dotenv": "latest",
-    "mongoose": "latest"
+    "chalk": "5.6.2",
+    "discord.js": "14.24.2",
+    "dotenv": "17.2.3",
+    "mongoose": "8.19.3"
   },
   "devDependencies": {
-    "nodemon": "latest"
+    "nodemon": "3.1.10"
   }
 }

@@ -1,16 +1,45 @@
 // Bot açıldığında ve kapandığında durum mesajı göndermek için yardımcı fonksiyonlar
-
 const { statusChannelId } = require('../../config/channels');
 const getBotStats = require('./getBotStats');
+const logger = require('../utils/logger');
 
 function formatDateTR(date) {
   return date.toLocaleString('tr-TR', { hour12: false });
 }
 
+async function resolveStatusChannel(client) {
+  if (!statusChannelId) {
+    return null;
+  }
+
+  const cachedChannel = client.channels.cache.get(statusChannelId);
+  if (cachedChannel) {
+    return cachedChannel;
+  }
+
+  try {
+    return await client.channels.fetch(statusChannelId);
+  } catch (error) {
+    await logger.warn('Durum kanalı alınamadı veya erişim yok.');
+    await logger.debug(error);
+    return null;
+  }
+}
+
+async function sendStatusEmbed(client, embed) {
+  const channel = await resolveStatusChannel(client);
+  if (!channel) {
+    return;
+  }
+  try {
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    await logger.warn('Durum mesajı gönderilemedi.');
+    await logger.debug(error);
+  }
+}
+
 async function sendOnlineStatus(client) {
-  if (!statusChannelId) return;
-  const channel = client.channels.cache.get(statusChannelId);
-  if (!channel) return;
   const stats = await getBotStats(client);
   const now = new Date();
   const embed = {
@@ -23,13 +52,10 @@ async function sendOnlineStatus(client) {
     footer: { text: `Online: ${formatDateTR(now)}` },
     timestamp: now
   };
-  await channel.send({ embeds: [embed] });
+  await sendStatusEmbed(client, embed);
 }
 
 async function sendOfflineStatus(client) {
-  if (!statusChannelId) return;
-  const channel = client.channels.cache.get(statusChannelId);
-  if (!channel) return;
   const stats = await getBotStats(client);
   const now = new Date();
   const embed = {
@@ -42,7 +68,7 @@ async function sendOfflineStatus(client) {
     footer: { text: `Offline: ${formatDateTR(now)}` },
     timestamp: now
   };
-  await channel.send({ embeds: [embed] });
+  await sendStatusEmbed(client, embed);
 }
 
 module.exports = {

@@ -1,6 +1,25 @@
 // Komut loglarını belirli bir kanala gönderen yardımcı fonksiyon
-
+const logger = require('../utils/logger');
 const { logChannelId } = require('../../config/channels');
+
+async function resolveLogChannel(client) {
+  if (!logChannelId) {
+    return null;
+  }
+
+  const cachedChannel = client.channels.cache.get(logChannelId);
+  if (cachedChannel) {
+    return cachedChannel;
+  }
+
+  try {
+    return await client.channels.fetch(logChannelId);
+  } catch (error) {
+    await logger.warn('Komut log kanalı alınamadı veya erişim yok.');
+    await logger.debug(error);
+    return null;
+  }
+}
 
 async function logCommand({ client, user, command, args, guild, channel }) {
   const userTag = user?.tag || 'Bilinmiyor';
@@ -15,17 +34,18 @@ async function logCommand({ client, user, command, args, guild, channel }) {
     `Argümanlar: ${argString}`;
 
   // Konsola yazdır (logger ile)
-  const logger = require('../utils/logger');
-  logger.info(`[KOMUT LOG] ${userTag} (${user?.id}) | ${guildName} | #${channelName} | Komut: ${command} | Argümanlar: ${argString}`);
+  await logger.info(`[KOMUT LOG] ${userTag} (${user?.id}) | ${guildName} | #${channelName} | Komut: ${command} | Argümanlar: ${argString}`);
 
   // Discord kanalına gönder
-  if (!logChannelId) return;
-  const logChannel = client.channels.cache.get(logChannelId);
-  if (!logChannel) return;
+  const logChannel = await resolveLogChannel(client);
+  if (!logChannel) {
+    return;
+  }
   try {
     await logChannel.send(content);
   } catch (e) {
-    // Hata olursa sessizce geç
+    await logger.warn('Komut logu kanala gönderilemedi.');
+    await logger.debug(e);
   }
 }
 

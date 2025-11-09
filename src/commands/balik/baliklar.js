@@ -1,6 +1,7 @@
-const fishes = require("../../data/fishes");
-const { EmbedBuilder } = require("discord.js");
-const formatKg = require("../../core/utils/formatKg");
+const fishes = require('../../data/fishes');
+const { EmbedBuilder } = require('discord.js');
+const formatKg = require('../../core/utils/formatKg');
+const formatPrice = require('../../core/utils/formatPrice');
 
 module.exports = {
   name: "baliklar",
@@ -16,7 +17,7 @@ module.exports = {
         value:
           `Açıklama: ${fish.description}\n` +
           `Ağırlık: ${formatKg(fish.kgRange[0])} - ${formatKg(fish.kgRange[1])}\n` +
-          `Fiyat: Baz ${fish.price.base}₺ + kg başı ${fish.price.perKg}₺\n` +
+          `Fiyat: Baz ${formatPrice(fish.price.base)} + kg başı ${formatPrice(fish.price.perKg)}\n` +
           `Yakalanma Şansı: %${(fish.chance * 100).toFixed(1)}`,
         inline: false
       });

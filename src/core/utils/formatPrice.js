@@ -1,14 +1,20 @@
-const config = require("../../config");
+const config = require('../../config');
 
+function getCurrencyIcon() {
+  if (config.economy?.currency?.icon) {
+    return config.economy.currency.icon;
+  }
+  if (config.currency?.icon) {
+    return config.currency.icon;
+  }
+  return '₺';
+}
 
 function formatPrice(amount) {
-  let icon = '₺';
-  if (config.economy && config.economy.currency && config.economy.currency.icon) {
-    icon = config.economy.currency.icon;
-  } else if (config.currency && config.currency.icon) {
-    icon = config.currency.icon;
-  }
-  return `${amount.toFixed(2)} ${icon}`;
+  const value = Number(amount);
+  const safeAmount = Number.isFinite(value) ? value : 0;
+  const icon = getCurrencyIcon();
+  return `${safeAmount.toFixed(2)} ${icon}`;
 }
 
 module.exports = formatPrice;

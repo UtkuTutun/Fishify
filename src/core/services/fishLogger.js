@@ -1,11 +1,32 @@
 // !fish komutu ile tutulan balıkların detaylı logunu özel kanala gönderir
-
 const { fishLogChannelId } = require('../../config/channels');
+const logger = require('../utils/logger');
+
+async function resolveFishLogChannel(client) {
+  if (!fishLogChannelId) {
+    return null;
+  }
+
+  const cachedChannel = client.channels.cache.get(fishLogChannelId);
+  if (cachedChannel) {
+    return cachedChannel;
+  }
+
+  try {
+    return await client.channels.fetch(fishLogChannelId);
+  } catch (error) {
+    await logger.warn('Balık log kanalı alınamadı veya erişim yok.');
+    await logger.debug(error);
+    return null;
+  }
+}
 
 async function logFishCatch({ client, user, guild, channel, fish, amount, kg, total, time }) {
-  if (!fishLogChannelId) return;
-  const logChannel = client.channels.cache.get(fishLogChannelId);
-  if (!logChannel) return;
+  const logChannel = await resolveFishLogChannel(client);
+  if (!logChannel) {
+    return;
+  }
+
   const userTag = user?.tag || 'Bilinmiyor';
   const guildName = guild?.name || 'DM';
   const channelName = channel?.name || 'DM';
@@ -24,10 +45,12 @@ async function logFishCatch({ client, user, guild, channel, fish, amount, kg, to
       `• **Tarih:** ${now.toLocaleString('tr-TR', { hour12: false })}`,
     timestamp: now
   };
+
   try {
     await logChannel.send({ embeds: [embed] });
-  } catch (e) {
-    // Hata olursa sessizce geç
+  } catch (error) {
+    await logger.warn('Balık logu kanala gönderilemedi.');
+    await logger.debug(error);
   }
 }
 
