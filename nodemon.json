@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": ["src/events/", "src/loaders/"],
+  "exec": "node src/bot.js"
+}
