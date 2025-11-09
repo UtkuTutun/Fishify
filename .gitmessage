@@ -1,0 +1,33 @@
+
+# Fishify için gelişmiş otomatik commit mesajı şablonu
+#
+# Lütfen aşağıdaki şablonu doldurun. Satır başında # olanlar commit mesajına eklenmez.
+# Türkçe, kısa ve açıklayıcı mesajlar kullanmaya özen gösterin.
+
+------------------------------------------------------------------------
+Kısa başlık (zorunlu, 50 karakteri geçmemeli)
+------------------------------------------------------------------------
+
+Özet açıklama (isteğe bağlı, 1-2 cümle ile ne değişti, neden?)
+
+Değişiklikler:
+- (Örnek: src/bot.js başlatma akışı güncellendi)
+- (Örnek: README.md balık verileriyle güncellendi)
+- (Örnek: .env.example eklendi)
+
+Etki/Notlar:
+- (Varsa önemli bir not, breaking change, migration, vs.)
+
+İlgili Issue/PR:
+# (Varsa ilgili GitHub issue veya PR numarası)
+
+# -------------------------------------------------------------
+# Kısa başlık zorunlu, diğer alanlar isteğe bağlıdır.
+# Gereksiz satırları silebilirsiniz.
+#
+# Örnek başlıklar:
+#   Balık nadirlikleri güncellendi
+#   Ekonomi sistemi optimize edildi
+#   Komutlar kategorize edildi
+#   Hata düzeltmesi: balık tutma bug'ı
+# -------------------------------------------------------------
