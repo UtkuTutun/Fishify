@@ -1,7 +1,7 @@
 const path = require("path");
 const { EmbedBuilder } = require("discord.js");
 
-const guildConfigService = require('../../core/services/guildConfigService');
+const guildConfigService = require('../../core/services/guild/guildConfigService');
 
 
 

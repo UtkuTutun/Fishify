@@ -6,7 +6,7 @@ const commandLoader = require('./core/loaders/commandLoader');
 const eventLoader = require('./core/loaders/eventLoader');
 const connectDatabase = require('./database/database');
 const logger = require('./core/utils/logger');
-const { sendOfflineStatus } = require('./core/services/botStatus');
+const { sendOfflineStatus } = require('./core/services/bot/botStatus');
 
 const client = new Client({
   intents: [

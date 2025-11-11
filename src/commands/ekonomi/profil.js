@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 
-const economyService = require('../../core/services/economyService');
+const economyService = require('../../core/services/economy/economyService');
 const formatPrice = require('../../core/utils/formatPrice');
 const formatKg = require('../../core/utils/formatKg');
 

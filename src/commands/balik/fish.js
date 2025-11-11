@@ -4,7 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 
 const formatPrice = require('../../core/utils/formatPrice');
 const formatKg = require('../../core/utils/formatKg');
-const fishingService = require('../../core/services/fishingService');
+const fishingService = require('../../core/services/fishing/fishingService');
 const { logFishCatch } = require('../../core/services/fishLogger');
 const logger = require('../../core/utils/logger');
 

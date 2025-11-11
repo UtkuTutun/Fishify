@@ -1,5 +1,5 @@
-const Guild = require('../../database/models/Guild');
-const config = require('../../config');
+const Guild = require('../../../database/models/Guild');
+const config = require('../../../config');
 
 const CACHE_TTL_MS = 60 * 1000;
 const cache = new Map(); // guildId -> { data, expiresAt }

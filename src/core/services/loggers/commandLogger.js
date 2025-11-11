@@ -1,6 +1,6 @@
 // Komut loglarını belirli bir kanala gönderen yardımcı fonksiyon
-const logger = require('../utils/logger');
-const { logChannelId } = require('../../config/channels');
+const logger = require('../../utils/logger');
+const { logChannelId } = require('../../../config/channels');
 
 async function resolveLogChannel(client) {
   if (!logChannelId) {

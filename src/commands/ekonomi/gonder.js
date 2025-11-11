@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 
 const config = require('../../config');
 const formatPrice = require('../../core/utils/formatPrice');
-const economyService = require('../../core/services/economyService');
+const economyService = require('../../core/services/economy/economyService');
 const logMoneyTransfer = require('../../core/services/moneyTransferLogger');
 const logger = require('../../core/utils/logger');
 

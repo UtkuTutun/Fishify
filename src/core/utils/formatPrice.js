@@ -1,14 +1,5 @@
-const config = require('../../config');
 
-function getCurrencyIcon() {
-  if (config.economy?.currency?.icon) {
-    return config.economy.currency.icon;
-  }
-  if (config.currency?.icon) {
-    return config.currency.icon;
-  }
-  return '₺';
-}
+const { getCurrencyIcon } = require('./currency');
 
 function formatPrice(amount) {
   const value = Number(amount);

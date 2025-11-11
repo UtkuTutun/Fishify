@@ -1,6 +1,6 @@
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
-const guildConfigService = require('../../core/services/guildConfigService');
+const guildConfigService = require('../../core/services/guild/guildConfigService');
 const { extractChannelIdsFromArgs, ensureGuildChannel } = require('../../core/utils/channelParser');
 
 module.exports = {

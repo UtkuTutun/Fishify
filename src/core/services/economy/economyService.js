@@ -1,18 +1,12 @@
-const config = require('../../config');
-const User = require('../../database/models/User');
-const TransferDailyStat = require('../../database/models/TransferDailyStat');
-const logger = require('../utils/logger');
+const config = require('../../../config');
+const User = require('../../../database/models/User');
+const TransferDailyStat = require('../../../database/models/TransferDailyStat');
+
+const logger = require('../../utils/logger');
+const { getCurrencyIcon, roundCurrency } = require('../../utils/currency');
 
 const TOTAL_RECEIVER_ID = '__TOTAL__';
 const TURKEY_TZ = 'Europe/Istanbul';
-
-function roundCurrency(value) {
-  return Math.round(Number(value) * 100) / 100;
-}
-
-function getCurrencyIcon() {
-  return config.economy?.currency?.icon || '₺';
-}
 
 function getTransferSettings() {
   return config.economy?.transfer || {};

@@ -1,6 +1,8 @@
-const fishes = require('../../data/fishes');
-const rarities = require('../../data/rarities');
-const economyService = require('./economyService');
+const fishes = require('../../../data/fishes');
+const rarities = require('../../../data/rarities');
+
+const economyService = require('../economy/economyService');
+const { roundCurrency } = require('../utils/currency');
 
 function buildRarityTable() {
   const list = Object.values(rarities);

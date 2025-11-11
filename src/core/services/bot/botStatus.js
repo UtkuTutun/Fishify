@@ -1,11 +1,9 @@
 // Bot açıldığında ve kapandığında durum mesajı göndermek için yardımcı fonksiyonlar
-const { statusChannelId } = require('../../config/channels');
+const { statusChannelId } = require('../../../config/channels');
 const getBotStats = require('./getBotStats');
-const logger = require('../utils/logger');
 
-function formatDateTR(date) {
-  return date.toLocaleString('tr-TR', { hour12: false });
-}
+const logger = require('../../utils/logger');
+const formatDateTR = require('../../utils/formatDateTR');
 
 async function resolveStatusChannel(client) {
   if (!statusChannelId) {

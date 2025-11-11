@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 const formatPrice = require('../../core/utils/formatPrice');
-const economyService = require('../../core/services/economyService');
+const economyService = require('../../core/services/economy/economyService');
 
 module.exports = {
   name: 'siralama',

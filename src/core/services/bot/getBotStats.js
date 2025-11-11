@@ -1,6 +1,6 @@
 // Botun genel istatistiklerini toplayan yardımcı fonksiyon
-const User = require('../../database/models/User');
-const logger = require('../utils/logger');
+const User = require('../../../database/models/User');
+const logger = require('../../utils/logger');
 
 async function getBotStats(client) {
   const totalGuilds = client.guilds.cache.size;

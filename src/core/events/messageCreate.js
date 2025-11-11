@@ -1,9 +1,9 @@
 const { EmbedBuilder } = require('discord.js');
 
 const config = require('../../config');
-const { logCommand } = require('../services/commandLogger');
+const { logCommand } = require('../services/loggers/commandLogger');
 const logger = require('../utils/logger');
-const guildConfigService = require('../services/guildConfigService');
+const guildConfigService = require('../services/guild/guildConfigService');
 
 const ALWAYS_ALLOWED = new Set(config.alwaysAllowedCommands.map((cmd) => cmd.toLowerCase()));
 

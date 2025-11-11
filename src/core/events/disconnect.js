@@ -1,5 +1,5 @@
 const logger = require('../utils/logger');
-const { sendOfflineStatus } = require('../services/botStatus');
+const { sendOfflineStatus } = require('../services/bot/botStatus');
 
 let offlineNotified = false;
 
